@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Productos - Hazel Lab</title>
+  <link rel="stylesheet" href="../../css/cliente-styles.css">
+  <link rel="stylesheet" href="../../css/productos-styles.css">
+</head>
+<body>
+  <!-- HEADER -->
+  <header>
+    <div id="logo"><a href="../../index.html">Hazel🌰Lab</a></div>
+    <nav>
+      <a href="../../index.html">Home</a>
+      <a href="productos.html" class="active">Productos</a>
+      <a href="blogs.html">Blogs</a>
+      <a href="nosotros.html">Nosotros</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="login.html">Iniciar Sesión</a>
+      <a href="registro.html">Registro</a>
+    </nav>
+    <div id="cart">
+      <span>🛒</span>
+      <div id="cart-dropdown">
+        <ul id="cart-items">
+          <li>Carrito vacío</li>
+        </ul>
+        <div><a href="carrito.html"><span>🛒</span>Carrito</a></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="container my-5">
+    <h1>Productos</h1>
+
+    <!-- Filtro por categoría -->
+    <label for="productos-filtro">Filtrar por categoría:</label>
+    <select id="productos-filtro">
+      <option value="todas">Todas</option>
+    </select>
+
+    <div id="productos-lista">
+      <!-- Se llenará dinámicamente desde admin-scripts.js -->
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 DUOC - Hazel Lab</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="../../js/admin-scripts.js"></script>
+  <script>
+    const KEY = "carrito";
+    const PLACEHOLDER_IMG = "../../img/wooden.jpg";
+
+    function obtenerCarrito() {
+      return JSON.parse(localStorage.getItem(KEY)) || [];
+    }
+
+    function guardarCarrito(c) {
+      localStorage.setItem(KEY, JSON.stringify(c));
+    }
+
+    function agregarAlCarrito(codigo) {
+      let carrito = obtenerCarrito();
+      const index = carrito.findIndex(item => item.codigo === codigo);
+      if (index > -1) {
+        carrito[index].cantidad++;
+      } else {
+        carrito.push({ codigo, cantidad: 1 });
+      }
+      guardarCarrito(carrito);
+      renderCarritoDropdown();
+      alert("Producto agregado al carrito");
+    }
+
+    function renderCarritoDropdown() {
+      const carrito = obtenerCarrito();
+      const lista = document.getElementById("cart-items");
+      lista.innerHTML = "";
+
+      if (carrito.length === 0) {
+        lista.innerHTML = "<li>Carrito vacío</li>";
+        return;
+      }
+
+      const productos = (typeof obtenerProductos === "function") ? obtenerProductos() : [];
+      const fmt = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' });
+
+      carrito.forEach(item => {
+        const prod = productos.find(p => p.codigo === item.codigo);
+        const li = document.createElement("li");
+        if (prod) {
+          li.textContent = `${prod.nombre} (${item.cantidad}) - ${fmt.format(prod.precio * item.cantidad)}`;
+        } else {
+          li.textContent = `${item.codigo} x${item.cantidad}`;
+        }
+        lista.appendChild(li);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const contenedor = document.getElementById("productos-lista");
+      const selectFiltro = document.getElementById("productos-filtro");
+      if (!contenedor) return;
+
+      let productos = [];
+      if (typeof obtenerProductos === "function") {
+        productos = obtenerProductos() || [];
+      }
+
+      // Obtener categorías únicas
+      const categorias = [...new Set(productos.map(p => p.categoria).filter(Boolean))];
+      categorias.forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        selectFiltro.appendChild(opt);
+      });
+
+      function renderProductos(filtro = "todas") {
+        contenedor.innerHTML = "";
+        const fmt = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' });
+
+        let filtrados = filtro === "todas" ? productos : productos.filter(p => p.categoria === filtro);
+
+        if (filtrados.length === 0) {
+          contenedor.innerHTML = "<p>No hay productos para mostrar.</p>";
+          return;
+        }
+
+        filtrados.forEach(p => {
+          const imgSrc = p.imagen || PLACEHOLDER_IMG;
+          const art = document.createElement("article");
+          art.innerHTML = `
+            <img src="${imgSrc}" alt="Imagen de ${p.nombre || 'producto'}" style="width:60px; height:60px; object-fit:cover; border-radius:5px; margin-bottom:10px;">
+            <h3>${p.nombre || "Sin nombre"}</h3>
+            <p>${p.descripcion ? p.descripcion.substring(0, 120) + (p.descripcion.length > 120 ? "…" : "") : ""}</p>
+            <p><strong>${fmt.format(p.precio || 0)}</strong></p>
+            <button type="button" onclick="agregarAlCarrito('${p.codigo || ''}')">Agregar al carrito</button>
+            <a href="detalle-producto.html?codigo=${p.codigo || ''}">Ver detalle</a>
+          `;
+          contenedor.appendChild(art);
+        });
+      }
+
+      // Llamadas iniciales
+      renderProductos();
+      renderCarritoDropdown();
+
+      // Cambiar filtro
+      selectFiltro.addEventListener("change", () => {
+        renderProductos(selectFiltro.value);
+      });
+    });
+  </script>
+</body>
+</html>

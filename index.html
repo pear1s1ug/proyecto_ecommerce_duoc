@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Home - Hazel Lab</title>
+    <link rel="stylesheet" href="css/cliente-styles.css">
+</head>
+
+<body>
+    <header>
+        <div id="logo"><a href="index.html">Hazel🌰Lab</a></div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="pages/cliente/productos.html">Productos</a>
+            <a href="pages/cliente/blogs.html">Blogs</a>
+            <a href="pages/cliente/nosotros.html">Nosotros</a>
+            <a href="pages/cliente/contacto.html">Contacto</a>
+            <a href="pages/cliente/login.html">Iniciar Sesión</a>
+            <a href="pages/cliente/registro.html">Registro</a>
+            <a href="pages/admin/menu-admin.html" id="link-menu-admin">Dashboard</a>
+        </nav>
+        <div id="cart"><a href="pages/cliente/carrito.html"><span>🛒</span>Carrito</a></div>
+    </header>
+    <main>
+        <section id="hero">
+          <h1 style="font-size:2.3em; font-weight:bold; text-align:center; margin-bottom:0.5em;">
+              Hazel<span style="color:#a0522d;">🌰</span>Lab <small style="font-size:0.5em; color:#888;">Digital Store</small>
+          </h1>
+          <p style="text-align:center; color:#666; font-size:1.15em;font-family:Verdana, Geneva, Tahoma, sans-serif;    margin-bottom:2.0em;">
+              Insumos de cocina y química
+          </p>
+          <img src="img/cocina-industrial.jpg" alt="Imagen hero" style="display:block; margin:0 auto; max-width:50%; border-radius:8px;">
+      </section>
+
+        <section id="productos">
+            <h2>Productos destacados</h2>
+            <div id="lista-productos">
+            </div>
+        </section>
+    </main>
+
+    <footer><p>© 2025 DUOC - Hazel Lab</p></footer>
+
+    <!-- Scripts -->
+    <script src="js/admin-scripts.js"></script>
+    <script>
+      (function(){
+        // Devuelve el nombre de archivo de imagen para un producto
+        function nombreAImagen(nombre) {
+          return "img/" + (nombre || "")
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // quitar tildes
+            .replace(/[^a-zA-Z0-9]/g, "") // quitar espacios y símbolos
+            + ".jpg";
+        }
+
+        function escapeHtml(str) {
+          return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        }
+
+        function agregarAlCarrito(codigo) {
+          const KEY = "carrito";
+          let carrito = [];
+          try { carrito = JSON.parse(localStorage.getItem(KEY)) || []; } catch {}
+          const index = carrito.findIndex(item => item.codigo === codigo);
+          if (index > -1) {
+            carrito[index].cantidad = (carrito[index].cantidad || 1) + 1;
+          } else {
+            carrito.push({ codigo: codigo, cantidad: 1 });
+          }
+          localStorage.setItem(KEY, JSON.stringify(carrito));
+          alert("Producto agregado al carrito");
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+          const container = document.getElementById("lista-productos");
+          if (!container) return;
+
+          let productos = [];
+          if (typeof obtenerProductos === "function") {
+            productos = obtenerProductos() || [];
+          } else {
+            console.warn("obtenerProductos() no disponible. Revisa que admin-scripts.js esté cargado en la ruta indicada.");
+          }
+
+          if (!productos || productos.length === 0) {
+            container.innerHTML = "<p>No hay productos para mostrar.</p>";
+            return;
+          }
+
+          let destacados = productos.filter(p => p && p.destacado).slice(0, 4);
+          if (destacados.length === 0) {
+            destacados = productos.slice(0, 4);
+          }
+
+          const fmt = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' });
+
+          destacados.forEach(p => {
+            // Si existe p.imagen, úsala; sino, intenta armar el nombre del archivo, sino placeholder
+            let imgSrc = p.imagen || nombreAImagen(p.nombre) || PLACEHOLDER_IMG;
+            // Opcional: si quieres validar que el archivo realmente exista, se puede hacer con un pequeño fetch, pero para simplicidad, se asume que existe.
+            const art = document.createElement("article");
+            art.innerHTML = `
+              <img src="${imgSrc}" alt="${escapeHtml(p.nombre || 'Producto')}" style="width:100%; max-height:180px; object-fit:cover; border-radius:4px; margin-bottom:10px;">
+              <h3>${escapeHtml(p.nombre || "Sin nombre")}</h3>
+              <p>${escapeHtml((p.descripcion || "").substring(0, 120))}${(p.descripcion && p.descripcion.length > 120 ? "…" : "")}</p>
+              <p><strong>${fmt.format(p.precio || 0)}</strong></p>
+              <button type="button" data-codigo="${escapeHtml(p.codigo || '')}">Agregar al carrito</button>
+            `;
+            container.appendChild(art);
+          });
+
+          container.addEventListener("click", function(ev){
+            const btn = ev.target.closest("button[data-codigo]");
+            if (!btn) return;
+            const codigo = btn.getAttribute("data-codigo");
+            if (!codigo) return;
+            agregarAlCarrito(codigo);
+          });
+        });
+      })();
+    </script>
+</body>
+</html>
