@@ -1,0 +1,224 @@
+/* =========================
+   RESET BÁSICO
+========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  color: #333;
+  background-color: #fff;
+  line-height: 1.6;
+}
+
+/* =========================
+   HEADER
+========================= */
+header {
+  background-color: #afdceb;
+  color: #223344;
+
+  /* 3 columnas: logo | nav | carrito */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+
+  padding: 15px 40px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+#logo {
+  justify-self: start;
+}
+
+#logo a {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #223344;
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  white-space: nowrap;
+}
+
+nav a {
+  color: #223344;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.25s ease;
+}
+
+nav a:hover {
+  color: #3b82f6; /* azul aesthetic */
+}
+
+#cart {
+  justify-self: end;
+}
+
+#cart a {
+  color: #3b82f6; /* azul aesthetic */
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+/* =========================
+   MAIN
+========================= */
+main {
+  padding: 40px 10%;
+}
+
+/* HERO */
+#hero {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+#hero h1 {
+  font-size: 2rem;
+  margin-bottom: 15px;
+}
+
+#hero img {
+  max-width: 100%;
+  border-radius: 6px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* LISTA DE PRODUCTOS */
+#productos h2 {
+  margin-bottom: 20px;
+}
+
+#lista-productos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+#lista-productos article {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 15px;
+  text-align: center;
+  background-color: #fafafa;
+  transition: box-shadow 0.3s ease;
+}
+
+#lista-productos article:hover {
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+}
+
+#lista-productos h2 {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+#lista-productos p {
+  margin-bottom: 10px;
+}
+
+#lista-productos a,
+button {
+  background-color: #3b82f6; /* azul aesthetic */
+  color: #fff;
+  padding: 8px 15px;
+  border-radius: 4px;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#lista-productos a:hover,
+button:hover {
+  background-color: #2563eb; /* azul oscuro */
+}
+
+/* =========================
+   BLOGS
+========================= */
+main article {
+  margin-bottom: 40px;
+}
+
+main article h2 {
+  margin-bottom: 8px;
+}
+
+main article p {
+  margin-bottom: 8px;
+}
+
+/* =========================
+   FORMULARIOS
+========================= */
+form {
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+form label {
+  margin: 10px 0 5px;
+}
+
+form input,
+form textarea,
+form select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+form button {
+  margin-top: 20px;
+  background-color: #3b82f6; /* azul aesthetic */
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+form button:hover {
+  background-color: #2563eb; /* azul oscuro */
+}
+
+/*TITULO RESEÑA BLOGS 1 Y 2 */
+
+.card-title {
+  font-weight: bold !important;
+}
+
+/* =========================
+   FOOTER
+========================= */
+footer {
+  background-color: #5c7fa3 !important; /* azul pastel oscuro */
+  color: #e0f2fe !important;
+  text-align: center;
+  padding: 20px 0;
+  margin-top: 50px;
+  font-size: 0.85rem;
+}
+
+footer p {
+  margin: 0;
+}

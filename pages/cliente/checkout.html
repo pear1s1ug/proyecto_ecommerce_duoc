@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout - Hazel Lab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../../css/cliente-styles.css">
+  <link rel="stylesheet" href="../../css/productos-styles.css">
+  <style>
+    #checkout-container {
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: #f9f9f9;
+      text-align: center;
+    }
+    #checkout-container select,
+    #checkout-container button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 8px;
+      font-size: 1rem;
+    }
+    .alert-message {
+      color: red;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
+    <div id="logo">
+      <a href="../../index.html" class="text-white font-weight-bold" style="font-size: 1.2rem; text-decoration: none;">
+        Hazel🌰Lab
+      </a>
+    </div>
+    <div id="cart">
+      <span>🛒</span>
+      <div id="cart-dropdown">
+        <ul id="cart-items"></ul>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div id="checkout-container">
+      <h2>Checkout</h2>
+      <div id="checkout-content"></div>
+    </div>
+  </main>
+
+  <script src="../../js/admin-scripts.js"></script>
+  <script>
+    const usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
+    const checkoutContent = document.getElementById("checkout-content");
+
+    if (!usuarioActivo) {
+      // No hay sesión iniciada
+      checkoutContent.innerHTML = `
+        <p class="alert-message">Debes iniciar sesión para continuar con la compra.</p>
+        <a href="login.html" class="btn btn-primary mt-3">Iniciar Sesión</a>
+      `;
+    } else {
+      // Usuario logueado → mostrar método de pago
+      checkoutContent.innerHTML = `
+        <label for="metodo-pago">Selecciona método de pago:</label>
+        <select id="metodo-pago">
+          <option value="">--Seleccione--</option>
+          <option value="tarjeta">Tarjeta</option>
+          <option value="transferencia">Transferencia</option>
+          <option value="efectivo">Efectivo</option>
+        </select>
+        <button id="confirmar-compra">Confirmar Compra</button>
+      `;
+
+      document.getElementById("confirmar-compra").addEventListener("click", () => {
+        const metodo = document.getElementById("metodo-pago").value;
+        if (!metodo) {
+          alert("Debes seleccionar un método de pago");
+          return;
+        }
+        // Compra exitosa
+        alert("¡Compra exitosa!");
+        localStorage.removeItem("carrito"); // vaciar carrito
+        window.location.href = "../../index.html";
+      });
+    }
+
+    // Cargar carrito en el header desplegable
+    const cartItemsEl = document.getElementById("cart-items");
+    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    if (carrito.length === 0) {
+      cartItemsEl.innerHTML = "<li>Carrito vacío</li>";
+    } else {
+      carrito.forEach(item => {
+        cartItemsEl.innerHTML += `<li>${item.codigo} x ${item.cantidad}</li>`;
+      });
+    }
+  </script>
+</body>
+</html>

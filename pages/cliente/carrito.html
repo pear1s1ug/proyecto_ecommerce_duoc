@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Carrito - Hazel Lab</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/cliente-styles.css">
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+  <header>
+    <div id="logo"><a href="../../index.html">Hazel🌰Lab</a></div>
+  </header>
+
+  <main class="container my-5">
+    <h1>Carrito de Compras</h1>
+    <table id="carrito-tabla">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Precio Unitario</th>
+          <th>Cantidad</th>
+          <th>Total</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <p id="carrito-total"><strong>Total: $0</strong></p>
+    <a href="checkout.html" class="btn btn-primary">Proceder al Pago</a>
+  </main>
+
+  <script src="../../js/admin-scripts.js"></script>
+  <script>
+    const KEY = "carrito";
+    function obtenerCarrito() {
+      return JSON.parse(localStorage.getItem(KEY)) || [];
+    }
+    function guardarCarrito(c) {
+      localStorage.setItem(KEY, JSON.stringify(c));
+    }
+    function quitarDelCarrito(codigo) {
+      let c = obtenerCarrito();
+      c = c.filter(item => item.codigo !== codigo);
+      guardarCarrito(c);
+      renderCarrito();
+    }
+    function renderCarrito() {
+      const tbody = document.querySelector("#carrito-tabla tbody");
+      const totalEl = document.getElementById("carrito-total");
+      tbody.innerHTML = "";
+
+      const carrito = obtenerCarrito();
+      const productos = (typeof obtenerProductos === "function") ? obtenerProductos() : [];
+      const fmt = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' });
+
+      if (carrito.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='5'>El carrito está vacío</td></tr>";
+        totalEl.innerHTML = "<strong>Total: $0</strong>";
+        return;
+      }
+
+      let total = 0;
+      carrito.forEach(item => {
+        const prod = productos.find(p => p.codigo === item.codigo);
+        if (prod) {
+          const subtotal = prod.precio * item.cantidad;
+          total += subtotal;
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${prod.nombre}</td>
+            <td>${fmt.format(prod.precio)}</td>
+            <td>${item.cantidad}</td>
+            <td>${fmt.format(subtotal)}</td>
+            <td><button onclick="quitarDelCarrito('${item.codigo}')">Quitar</button></td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+      totalEl.innerHTML = `<strong>Total: ${fmt.format(total)}</strong>`;
+    }
+    document.addEventListener("DOMContentLoaded", renderCarrito);
+  </script>
+
+  <footer class=" text-center py-3 mt-auto">
+    <p class="mb-0">© 2025 DUOC</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle Producto - Hazel Lab</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../css/cliente-styles.css">
+    <style>
+        main {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+        .detalle-info { flex: 1 1 300px; }
+        .detalle-info h1 { font-size: 2rem; font-weight: bold; margin-bottom: 15px; }
+        .detalle-info p { margin-bottom: 10px; }
+        .detalle-info button { margin-top: 15px; padding: 10px 20px; font-size: 1rem; cursor: pointer; }
+        .detalle-imagen { flex: 1 1 300px; display: flex; justify-content: center; align-items: center; }
+        .detalle-imagen img { max-width: 100%; height: auto; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div id="logo"><a href="../../index.html">Hazel🌰Lab</a></div>
+        <nav>
+            <a href="../../index.html">Home</a>
+            <a href="productos.html">Productos</a>
+            <a href="blogs.html">Blogs</a>
+            <a href="nosotros.html">Nosotros</a>
+            <a href="contacto.html">Contacto</a>
+            <a href="login.html">Iniciar Sesión</a>
+            <a href="registro.html">Registro</a>
+        </nav>
+        <div id="cart"><a href="carrito.html"><span>🛒</span>Carrito</a></div>
+    </header>
+
+    <main>
+        <div class="detalle-info">
+            <h1 id="producto-nombre">Producto X</h1>
+            <p id="producto-descripcion">Descripción detallada del producto...</p>
+            <p id="producto-precio"><strong>Precio:</strong> $0</p>
+            <button id="btn-agregar-carrito">Añadir al carrito</button>
+        </div>
+        <div class="detalle-imagen">
+            <img id="producto-imagen" src="../../img/wooden.jpg" alt="Imagen del producto">
+        </div>
+    </main>
+
+    <footer class="text-center py-3 bg-dark text-light">
+        <p>© 2025 DUOC - Hazel Lab</p>
+    </footer>
+
+    <script src="../../js/admin-scripts.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const codigo = urlParams.get("codigo"); // obtenemos el código de la URL
+            const productos = obtenerProductos();
+            const producto = productos.find(p => p.codigo === codigo);
+
+            if (!producto) {
+                alert("Producto no encontrado");
+                window.location.href = "productos.html";
+                return;
+            }
+
+            // Mostrar solo este producto
+            document.getElementById("producto-nombre").textContent = producto.nombre;
+            document.getElementById("producto-descripcion").textContent = producto.descripcion || "Sin descripción";
+            document.getElementById("producto-precio").innerHTML = `<strong>Precio:</strong> ${new Intl.NumberFormat('es-CL', {style:'currency', currency:'CLP'}).format(producto.precio)}`;
+            document.getElementById("producto-imagen").src = producto.imagen || "../../img/wooden.jpg";
+
+            // Agregar al carrito
+            document.getElementById("btn-agregar-carrito").addEventListener("click", () => {
+                const KEY = "carrito";
+                let carrito = JSON.parse(localStorage.getItem(KEY)) || [];
+                const index = carrito.findIndex(item => item.codigo === producto.codigo);
+                if (index > -1) {
+                    carrito[index].cantidad = (carrito[index].cantidad || 1) + 1;
+                } else {
+                    carrito.push({ codigo: producto.codigo, cantidad: 1 });
+                }
+                localStorage.setItem(KEY, JSON.stringify(carrito));
+                alert("Producto agregado al carrito");
+            });
+        });
+    </script>
+</body>
+</html>
