@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Editar Producto</title>
+  <link rel="stylesheet" href="../../css/admin-styles.css">
+</head>
+<body>
+  <div id="container">
+    <!-- Sidebar -->
+    <aside id="menu-sidebar">
+      <div id="logo">Hazel🌰Lab</div>
+      <nav id="menu">
+        <ul>
+          <li><a href="menu-admin.html" class="active">Dashboard</a></li>
+          <li><a href="vista-clientes.html">Ver Clientes</a></li>
+          <li><a href="vista-productos.html">Ver Inventario</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main id="main">
+      <header id="header">
+        <h2>Editar Producto</h2>
+      </header>
+
+      <section id="form-section">
+        <form id="editarProductoForm">
+          <fieldset>
+            <legend>Modificar datos del producto</legend>
+
+            <label for="codigo">Código Producto</label>
+            <input type="text" id="codigo" name="codigo" readonly>
+
+            <label for="lote">Código Lote *</label>
+            <input type="text" id="lote" name="lote" required minlength="3">
+
+            <label for="nombre">Nombre *</label>
+            <input type="text" id="nombre" name="nombre" required maxlength="100">
+
+            <label for="descripcion">Descripción</label>
+            <textarea id="descripcion" name="descripcion" maxlength="500" rows="3"></textarea>
+
+            <label for="precio">Precio *</label>
+            <input type="number" id="precio" name="precio" required min="0" step="0.01">
+
+            <label for="stock">Stock *</label>
+            <input type="number" id="stock" name="stock" required min="0">
+
+            <label for="stockCritico">Stock Crítico</label>
+            <input type="number" id="stockCritico" name="stockCritico" min="0">
+
+            <label for="categoria">Categoría *</label>
+            <select id="categoria" name="categoria" required></select>
+
+            <label for="fechaElaboracion">Fecha de Elaboración *</label>
+            <input type="date" id="fechaElaboracion" name="fechaElaboracion" required>
+
+            <label for="fechaVencimiento">Fecha de Vencimiento *</label>
+            <input type="date" id="fechaVencimiento" name="fechaVencimiento" required>
+
+            <label for="codigoQuimico">Código Químico</label>
+            <input type="text" id="codigoQuimico" name="codigoQuimico" maxlength="50">
+
+            <label for="proveedor">Proveedor</label>
+            <input type="text" id="proveedor" name="proveedor" maxlength="100">
+          </fieldset>
+
+          <div class="form-actions">
+            <button type="submit">Guardar Cambios</button>
+            <button type="button" class="btn-delete"
+              onclick="if(confirm('¿Seguro que deseas eliminar este producto?')) { eliminarProducto(); }">
+              Eliminar Producto
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="../../js/admin-scripts.js"></script>
+  <script>
+    // Llenar select de categorías
+    llenarCategorias("categoria");
+
+    // Obtener código desde URL
+    const params = new URLSearchParams(window.location.search);
+    const codigoProducto = params.get("codigo");
+
+    const productos = obtenerProductos();
+    const producto = productos.find(p => p.codigo === codigoProducto);
+
+    if(producto){
+      document.getElementById("codigo").value = producto.codigo;
+      document.getElementById("lote").value = producto.lote;
+      document.getElementById("nombre").value = producto.nombre;
+      document.getElementById("descripcion").value = producto.descripcion || "";
+      document.getElementById("precio").value = producto.precio;
+      document.getElementById("stock").value = producto.stock;
+      document.getElementById("stockCritico").value = producto.stockCritico || "";
+      document.getElementById("categoria").value = producto.categoria;
+      document.getElementById("fechaElaboracion").value = producto.fechaElaboracion || "";
+      document.getElementById("fechaVencimiento").value = producto.fechaVencimiento || "";
+      document.getElementById("codigoQuimico").value = producto.codigoQuimico || "";
+      document.getElementById("proveedor").value = producto.proveedor || "";
+    } else {
+      alert("Producto no encontrado");
+      window.location.href = "vista-productos.html?t=" + Date.now();
+    }
+
+    // Guardar cambios
+    document.getElementById("editarProductoForm").addEventListener("submit", function(e){
+      e.preventDefault();
+
+      const lote = document.getElementById("lote").value.trim();
+      const nombre = document.getElementById("nombre").value.trim();
+      const descripcion = document.getElementById("descripcion").value.trim();
+      const precio = parseFloat(document.getElementById("precio").value);
+      const stock = parseInt(document.getElementById("stock").value);
+      const stockCritico = document.getElementById("stockCritico").value ? parseInt(document.getElementById("stockCritico").value) : null;
+      const categoria = document.getElementById("categoria").value;
+      const fechaElaboracion = document.getElementById("fechaElaboracion").value;
+      const fechaVencimiento = document.getElementById("fechaVencimiento").value;
+      const codigoQuimico = document.getElementById("codigoQuimico").value.trim();
+      const proveedor = document.getElementById("proveedor").value.trim();
+
+      // Validaciones
+      if (!validarLote(lote)) {
+        alert("Lote inválido. Debe tener al menos 3 caracteres.");
+        return;
+      }
+
+      if (!validarPrecio(precio)) {
+        alert("Precio inválido. Debe ser mayor o igual a 0.");
+        return;
+      }
+
+      if (!validarStock(stock)) {
+        alert("Stock inválido. Debe ser un número entero mayor o igual a 0.");
+        return;
+      }
+
+      if (stockCritico !== null && !validarStockCritico(stockCritico)) {
+        alert("Stock crítico inválido. Debe ser un número entero mayor o igual a 0.");
+        return;
+      }
+
+      // Actualizar producto
+      const productos = obtenerProductos();
+      const productoIndex = productos.findIndex(p => p.codigo === codigoProducto);
+      
+      if (productoIndex !== -1) {
+        productos[productoIndex] = {
+          ...productos[productoIndex],
+          lote: lote,
+          nombre: nombre,
+          descripcion: descripcion,
+          precio: precio,
+          stock: stock,
+          stockCritico: stockCritico,
+          categoria: categoria,
+          fechaElaboracion: fechaElaboracion,
+          fechaVencimiento: fechaVencimiento,
+          codigoQuimico: codigoQuimico,
+          proveedor: proveedor
+        };
+
+        guardarProductos(productos);
+        alert("Producto actualizado correctamente");
+        window.location.href = "vista-productos.html?t=" + Date.now();
+      }
+    });
+
+    // Eliminar producto
+    function eliminarProducto(){
+      const productos = obtenerProductos();
+      const productosActualizados = productos.filter(p => p.codigo !== codigoProducto);
+      guardarProductos(productosActualizados);
+      alert("Producto eliminado correctamente");
+      window.location.href = "vista-productos.html?t=" + Date.now();
+    }
+  </script>
+</body>
+</html>

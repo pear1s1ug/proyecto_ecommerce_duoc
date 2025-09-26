@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Clientes - Hazel Lab</title>
+  <link rel="stylesheet" href="../../css/admin-styles.css">
+</head>
+<body>
+  <div id="container">
+    <aside id="menu-sidebar">
+      <div id="logo">Hazel🌰Lab</div>
+      <nav id="menu">
+        <ul>
+          <li><a href="menu-admin.html" class="active">Dashboard</a></li>
+          <li><a href="vista-clientes.html">Ver Clientes</a></li>
+          <li><a href="vista-productos.html">Ver Inventario</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main id="main">
+      <header id="header">
+        <h2>Listado de Clientes</h2>
+        <a href="nuevo-cliente.html"><button>Nuevo Cliente</button></a>
+      </header>
+
+      <section id="content">
+        <div class="table-wrapper">
+          <table id="clientes-table">
+            <thead>
+              <tr>
+                <th>RUN</th>
+                <th>Nombre</th>
+                <th>Apellidos</th>
+                <th>Correo</th>
+                <th>Fecha Nacimiento</th>
+                <th>Tipo Usuario</th>
+                <th>Región</th>
+                <th>Comuna</th>
+                <th>Dirección</th>
+                <th>Contraseña</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="clientes-tbody">
+              <!-- Se llenará dinámicamente desde admin-scripts.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../../js/admin-scripts.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const tbody = document.getElementById('clientes-tbody');
+      const clientes = obtenerClientes();
+
+      tbody.innerHTML = '';
+
+      clientes.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${c.id}</td>
+          <td>${c.nombre}</td>
+          <td>${c.apellidos}</td>
+          <td>${c.correo || ''}</td>
+          <td>${c.fechaNacimiento || ''}</td>
+          <td>${c.tipoUsuario || ''}</td>
+          <td>${c.region || ''}</td>
+          <td>${c.comuna || ''}</td>
+          <td>${c.direccion || ''}</td>
+          <td>${c.clave ? '🔒' : ''}</td>
+          <td>
+            <a href="editar-cliente.html?run=${c.id}">Editar</a>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    });
+  </script>
+</body>
+</html>

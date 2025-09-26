@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Editar Cliente</title>
+  <link rel="stylesheet" href="../../css/admin-styles.css">
+</head>
+<body>
+  <div id="container">
+    <aside id="menu-sidebar">
+      <div id="logo">Hazel🌰Lab</div>
+      <nav id="menu">
+        <ul>
+          <li><a href="menu-admin.html" class="active">Dashboard</a></li>
+          <li><a href="vista-clientes.html">Ver Clientes</a></li>
+          <li><a href="vista-productos.html">Ver Inventario</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main id="main">
+      <header id="header">
+        <h2>Editar Cliente</h2>
+      </header>
+
+      <section id="form-section">
+        <form id="editarClienteForm">
+          <fieldset>
+            <legend>Modificar datos del cliente</legend>
+
+            <label for="run">RUN</label>
+            <input type="text" id="run" name="run" readonly>
+
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" name="nombre" required maxlength="50">
+
+            <label for="apellidos">Apellidos</label>
+            <input type="text" id="apellidos" name="apellidos" required maxlength="100">
+
+            <label for="correo">Correo</label>
+            <input type="email" id="correo" name="correo" required maxlength="100">
+
+            <label for="fechaNacimiento">Fecha de Nacimiento</label>
+            <input type="date" id="fechaNacimiento" name="fechaNacimiento">
+
+            <label for="tipoUsuario">Tipo de Usuario</label>
+            <select id="tipoUsuario" name="tipoUsuario">
+              <option value="">Seleccione el tipo</option>
+              <option value="Administrador">Administrador</option>
+              <option value="Cliente">Cliente</option>
+              <option value="Vendedor">Vendedor</option>
+            </select>
+
+            <label for="region">Región</label>
+            <select id="region" name="region" required></select>
+
+            <label for="comuna">Comuna</label>
+            <select id="comuna" name="comuna" required></select>
+
+            <label for="direccion">Dirección</label>
+            <input type="text" id="direccion" name="direccion" required maxlength="300">
+
+            <label for="clave">Contraseña (opcional)</label>
+            <input type="password" id="clave" name="clave" minlength="4" maxlength="10">
+
+            <label for="confirmarClave">Confirmar Contraseña</label>
+            <input type="password" id="confirmarClave" name="confirmarClave" minlength="4" maxlength="10">
+          </fieldset>
+
+          <div class="form-actions">
+            <button type="submit">Guardar Cambios</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="../../js/admin-scripts.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      llenarRegionesYComunas("region", "comuna");
+
+      const params = new URLSearchParams(window.location.search);
+      const runCliente = params.get("run");
+
+      const clientes = obtenerClientes();
+      const cliente = clientes.find(c => String(c.id) === runCliente);
+
+      if (!cliente) {
+        alert("Cliente no encontrado");
+        window.location.href = "vista-clientes.html";
+        return;
+      }
+
+      // Rellenar formulario
+      document.getElementById("run").value = cliente.id;
+      document.getElementById("nombre").value = cliente.nombre || "";
+      document.getElementById("apellidos").value = cliente.apellidos || "";
+      document.getElementById("correo").value = cliente.correo || "";
+      document.getElementById("fechaNacimiento").value = cliente.fechaNacimiento || "";
+      document.getElementById("tipoUsuario").value = cliente.tipoUsuario || "";
+      document.getElementById("region").value = cliente.region || "";
+      const regionSelect = document.getElementById("region");
+      const comunaSelect = document.getElementById("comuna");
+      if (cliente.region) {
+        regionSelect.dispatchEvent(new Event('change'));
+        setTimeout(() => { comunaSelect.value = cliente.comuna || ""; }, 120);
+      }
+      document.getElementById("direccion").value = cliente.direccion || "";
+
+      // Guardar cambios
+      document.getElementById("editarClienteForm").addEventListener("submit", function(e){
+        e.preventDefault();
+
+        const nombre = document.getElementById("nombre").value.trim();
+        const apellidos = document.getElementById("apellidos").value.trim();
+        const correo = document.getElementById("correo").value.trim();
+        const fechaNacimiento = document.getElementById("fechaNacimiento").value;
+        const tipoUsuario = document.getElementById("tipoUsuario").value;
+        const region = document.getElementById("region").value;
+        const comuna = document.getElementById("comuna").value;
+        const direccion = document.getElementById("direccion").value.trim();
+        const clave = document.getElementById("clave").value.trim();
+        const confirmarClave = document.getElementById("confirmarClave").value.trim();
+
+        if (!validarCorreo(correo)){
+          alert("Correo inválido. Solo se permiten @duoc.cl, @profesor.duoc.cl o @gmail.com");
+          return;
+        }
+
+        // Validar contraseña solo si se ingresó
+        if(clave || confirmarClave){
+          if(clave.length < 4 || clave.length > 10){
+            alert("La contraseña debe tener entre 4 y 10 caracteres");
+            return;
+          }
+          if(clave !== confirmarClave){
+            alert("Las contraseñas no coinciden");
+            return;
+          }
+        }
+
+        const clientesActual = obtenerClientes();
+        const clienteIndex = clientesActual.findIndex(c => String(c.id) === runCliente);
+
+        if (clienteIndex !== -1) {
+          clientesActual[clienteIndex] = {
+            ...clientesActual[clienteIndex],
+            nombre,
+            apellidos,
+            correo,
+            fechaNacimiento,
+            tipoUsuario,
+            region,
+            comuna,
+            direccion,
+            ...(clave ? {clave} : {}) // solo actualiza la contraseña si se ingresó
+          };
+          guardarClientes(clientesActual);
+          alert("Cliente actualizado correctamente");
+          window.location.href = "vista-clientes.html";
+        } else {
+          alert("No se pudo actualizar: cliente no encontrado.");
+        }
+      });
+    });
+  </script>
+</body>
+</html>

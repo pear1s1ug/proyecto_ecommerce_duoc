@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Inventario de Productos</title>
+  <link rel="stylesheet" href="../../css/admin-styles.css">
+</head>
+<body>
+    <div id="container">
+    <aside id="menu-sidebar">
+      <div id="logo">Hazel🌰Lab</div>
+      <nav id="menu">
+        <ul>
+          <li><a href="menu-admin.html" class="active">Dashboard</a></li>
+          <li><a href="vista-clientes.html">Ver Clientes</a></li>
+          <li><a href="vista-productos.html">Ver Inventario</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main id="main">
+      <header id="header">
+        <h2>Inventario de Productos</h2>
+        <a href="nuevo-producto.html"><button>Nuevo Producto</button></a>
+      </header>
+
+      <section id="content">
+        <div class="table-wrapper">
+          <table id="productos-table">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Lote</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Descripción</th>
+                <th>Stock</th>
+                <th>Stock crítico</th>
+                <th>Fecha Elaboración</th>
+                <th>Fecha Vencimiento</th>
+                <th>Precio</th>
+                <th>Proveedor</th>
+                <th>Código Químico</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="productos-tbody">
+              <!-- Se llenará dinámicamente desde admin-scripts.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../../js/admin-scripts.js"></script>
+</body>
+</html>
